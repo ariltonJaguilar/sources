@@ -1,0 +1,62 @@
+[
+	{
+		"type": "sort",
+		"title": "Sort",
+		"canAscend": false,
+		"options": [
+			"Recently Posted",
+			"Title",
+			"Pages",
+			"Most Viewed",
+			"Most Favorited"
+		]
+	},
+	{
+		"type": "multi-select",
+		"id": "category",
+		"title": "Category",
+		"options": ["Manga", "Doujinshi", "Illustration"]
+	},
+	{
+		"type": "text",
+		"id": "artist",
+		"title": "Artist",
+		"placeholder": "Separate multiple with commas"
+	},
+	{
+		"type": "text",
+		"id": "circle",
+		"title": "Circle",
+		"placeholder": "Separate multiple with commas"
+	},
+	{
+		"type": "text",
+		"id": "parody",
+		"title": "Parody",
+		"placeholder": "Separate multiple with commas"
+	},
+	{
+		"type": "text",
+		"id": "magazine",
+		"title": "Magazine",
+		"placeholder": "Separate multiple with commas"
+	},
+	{
+		"type": "text",
+		"id": "character",
+		"title": "Character",
+		"placeholder": "Separate multiple with commas"
+	},
+	{
+		"type": "text",
+		"id": "cosplayer",
+		"title": "Cosplayer",
+		"placeholder": "Separate multiple with commas"
+	},
+	{
+		"type": "text",
+		"id": "pages",
+		"title": "Pages",
+		"placeholder": "e.g. >20 or <50"
+	}
+]

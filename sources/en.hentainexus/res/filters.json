@@ -1,0 +1,50 @@
+[
+	{
+		"type": "text",
+		"id": "tag",
+		"title": "Tags",
+		"placeholder": "Separate with commas; prefix with - to exclude"
+	},
+	{
+		"type": "text",
+		"id": "artist",
+		"title": "Artists",
+		"placeholder": "Separate with commas; prefix with - to exclude"
+	},
+	{
+		"type": "text",
+		"id": "author",
+		"title": "Authors",
+		"placeholder": "Separate with commas; prefix with - to exclude"
+	},
+	{
+		"type": "text",
+		"id": "circle",
+		"title": "Circles",
+		"placeholder": "Separate with commas; prefix with - to exclude"
+	},
+	{
+		"type": "text",
+		"id": "event",
+		"title": "Events",
+		"placeholder": "Separate with commas; prefix with - to exclude"
+	},
+	{
+		"type": "text",
+		"id": "parody",
+		"title": "Parodies",
+		"placeholder": "Separate with commas; prefix with - to exclude"
+	},
+	{
+		"type": "text",
+		"id": "magazine",
+		"title": "Magazines",
+		"placeholder": "Separate with commas; prefix with - to exclude"
+	},
+	{
+		"type": "text",
+		"id": "publisher",
+		"title": "Publishers",
+		"placeholder": "Separate with commas; prefix with - to exclude"
+	}
+]

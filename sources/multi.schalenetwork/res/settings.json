@@ -1,0 +1,42 @@
+[
+	{
+		"type": "group",
+		"title": "Image Quality",
+		"items": [
+			{
+				"type": "select",
+				"key": "imageQuality",
+				"title": "Preferred Resolution",
+				"values": ["1280", "1600", "980", "780", "0"],
+				"titles": ["1280p (Default)", "1600p", "980p", "780p", "Original"],
+				"default": "1280"
+			}
+		]
+	},
+	{
+		"type": "group",
+		"title": "Display",
+		"items": [
+			{
+				"type": "switch",
+				"key": "removeAdditionalInfo",
+				"title": "Remove brackets from titles",
+				"subtitle": "Strips [tags] and (info) from manga titles",
+				"default": false
+			}
+		]
+	},
+	{
+		"type": "group",
+		"title": "Authentication",
+		"footer": "Required to load chapter pages. Get it from schale.network: open DevTools → Application → Local Storage → copy the value of 'clearance'.",
+		"items": [
+			{
+				"type": "text",
+				"key": "clearanceToken",
+				"title": "Clearance Token",
+				"placeholder": "Paste your clearance token here"
+			}
+		]
+	}
+]
