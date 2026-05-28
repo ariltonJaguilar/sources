@@ -2,11 +2,62 @@
 
 This repository hosts unofficial sources maintained by community members that are installable in [Aidoku](https://github.com/Aidoku/Aidoku).
 
-## Usage
+## ⚙️ Setup (primeira vez)
 
-On a device with Aidoku (0.7+) installed, you can open [https://aidoku-community.github.io/sources/](https://aidoku-community.github.io/sources/) and click the "Add Repository" button to add the source list directly to the app.
+Instale as ferramentas necessárias:
 
-Otherwise, navigate to the settings tab, and under the source lists page add `https://aidoku-community.github.io/sources/index.min.json`.
+```bash
+# 1. Instala o target WebAssembly do Rust
+rustup target add wasm32-unknown-unknown
+
+# 2. Instala o CLI do Aidoku
+cargo install --git https://github.com/Aidoku/aidoku-rs.git aidoku-cli
+```
+
+## 🚀 Como publicar as sources (após adicionar/alterar uma source)
+
+Execute os comandos abaixo a partir da raiz do repositório:
+
+```bash
+# 1. Compila e empacota todas as sources
+for src in sources/*/; do
+  (cd "$src" && aidoku package)
+done
+
+# 2. Gera o index.min.json (source list)
+aidoku build sources/*/package.aix --name "Arilton Sources"
+
+# 3. Commita e envia para o GitHub
+git add public/index.json public/index.min.json public/icons/ public/sources/
+git commit -m "chore: deploy source list"
+git push
+```
+
+Após o push, o arquivo estará disponível em:
+
+```
+https://ariltonjaguilar.github.io/sources/index.min.json
+```
+
+Para adicionar no Aidoku: **Settings → Source Lists → +** e cole a URL acima.
+
+## 📦 Como adicionar uma nova source
+
+1. Crie uma pasta em `sources/` com o padrão `lang.nomesource` (ex: `en.hentainexus`)
+2. Adicione os arquivos:
+   - `.cargo/config.toml` — configura o target wasm
+   - `Cargo.toml` — dependências Rust
+   - `src/lib.rs` — lógica da source
+   - `res/source.json` — metadados (id, name, version, url, languages)
+   - `res/icon.png` — ícone (PNG quadrado, ~144x144)
+3. Teste compilando: `cd sources/sua.source && cargo build`
+4. Execute os comandos de publicação acima
+
+---
+
+## Usage (original)
+
+On a device with Aidoku (0.7+) installed, navigate to the settings tab, and under the source lists page add `https://ariltonjaguilar.github.io/sources/index.min.json`.
 
 If a source is not working, or you want to request a source that isn't available in this source list, feel free to [create a new issue](https://github.com/Aidoku-Community/sources/issues).
 
