@@ -15,7 +15,7 @@ use models::{Books, ImagesInfo, MangaData, MangaDetail, select_quality};
 use settings::{get_clearance, get_quality, get_remove_brackets};
 
 const API: &str = "https://api.schale.network";
-const ORIGIN: &str = "https://schale.network";
+const ORIGIN: &str = "https://niyaniya.moe";
 
 // Sort ID constants
 const SORT_RECENTLY_POSTED: i32 = 4;

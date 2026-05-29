@@ -115,7 +115,7 @@ impl From<Entry> for Manga {
 			key: format!("{}/{}", e.id, e.key),
 			title: e.title,
 			cover: Some(e.thumbnail.path),
-			url: Some(format!("https://schale.network/g/{}/{}", e.id, e.key)),
+			url: Some(format!("https://niyaniya.moe/g/{}/{}", e.id, e.key)),
 			content_rating: ContentRating::NSFW,
 			status: MangaStatus::Completed,
 			update_strategy: UpdateStrategy::Never,

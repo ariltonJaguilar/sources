@@ -2,8 +2,8 @@
 	"info": {
 		"id": "multi.schalenetwork",
 		"name": "SchaleNetwork",
-		"version": 2,
-		"url": "https://schale.network",
+		"version": 3,
+		"url": "https://niyaniya.moe",
 		"contentRating": 2,
 		"languages": ["All", "en", "ja", "zh"]
 	},
