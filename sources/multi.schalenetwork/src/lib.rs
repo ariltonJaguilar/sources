@@ -46,7 +46,7 @@ impl Source for SchaleNetwork {
 		page: i32,
 		filters: Vec<FilterValue>,
 	) -> Result<MangaPageResult> {
-		let mut sort = SORT_RECENTLY_POSTED;
+		let mut sort: Option<i32> = None;
 		let mut cat_mask: u32 = 0;
 		let mut include_terms: Vec<String> = Vec::new();
 		let mut exclude_terms: Vec<String> = Vec::new();
@@ -54,14 +54,14 @@ impl Source for SchaleNetwork {
 		for filter in &filters {
 			match filter {
 				FilterValue::Sort { index, .. } => {
-					sort = match index {
+					sort = Some(match index {
 						0 => SORT_RECENTLY_POSTED,
 						1 => SORT_TITLE,
 						2 => SORT_PAGES,
 						3 => SORT_MOST_VIEWED,
 						4 => SORT_MOST_FAVORITED,
 						_ => SORT_RECENTLY_POSTED,
-					};
+					});
 				}
 				FilterValue::MultiSelect { id: _, included, .. } => {
 					for name in included {
@@ -92,17 +92,27 @@ impl Source for SchaleNetwork {
 			}
 		}
 
-		// Query string: raw query text + filter terms
+		// Build all search terms together (query + include filters + language)
 		let mut search_parts: Vec<String> = Vec::new();
 		if let Some(ref q) = query {
 			if !q.is_empty() {
-				search_parts.push(q.clone());
+				search_parts.push(format!("title:\"{q}\""));
 			}
 		}
 		search_parts.extend(include_terms);
 
-		let mut url = format!("{API}/books?page={page}&sort={sort}&limit=25");
+		// Apply selected language as a language filter (combined into the same s= param)
+		if let Some(lang) = defaults_get::<String>("selectedLanguage") {
+			if lang != "All" && !lang.is_empty() {
+				search_parts.push(format!("language:\"^{}$\"", lang.to_lowercase()));
+			}
+		}
 
+		let mut url = format!("{API}/books?page={page}");
+
+		if let Some(s) = sort {
+			url.push_str(&format!("&sort={s}"));
+		}
 		if !search_parts.is_empty() {
 			url.push_str("&s=");
 			url.push_str(&encode_uri_component(search_parts.join(" ")));
@@ -115,13 +125,10 @@ impl Source for SchaleNetwork {
 			url.push_str(&format!("&cat={cat_mask}"));
 		}
 
-		// Apply selected language as a language filter
-		if let Some(lang) = defaults_get::<String>("selectedLanguage") {
-			if lang != "All" && !lang.is_empty() {
-				let lang_term = format!("language:\"^{}$\"", lang.to_lowercase());
-				url.push_str("&s=");
-				url.push_str(&encode_uri_component(lang_term));
-			}
+		let clearance = get_clearance();
+		if let Some(ref crt) = clearance {
+			url.push_str("&crt=");
+			url.push_str(crt);
 		}
 
 		let books = Request::get(&url)?
@@ -161,7 +168,12 @@ impl Source for SchaleNetwork {
 		}
 
 		let (id, key) = split_key(&manga.key)?;
-		let url = format!("{API}/books/detail/{id}/{key}");
+		let clearance = get_clearance();
+		let mut url = format!("{API}/books/detail/{id}/{key}");
+		if let Some(ref crt) = clearance {
+			url.push_str("?crt=");
+			url.push_str(crt);
+		}
 		let detail = Request::get(&url)?
 			.header("Referer", &format!("{ORIGIN}/"))
 			.header("Origin", ORIGIN)
@@ -260,14 +272,26 @@ impl Source for SchaleNetwork {
 
 impl ListingProvider for SchaleNetwork {
 	fn get_manga_list(&self, listing: Listing, page: i32) -> Result<MangaPageResult> {
-		let sort = match listing.id.as_str() {
-			"recently-posted" => SORT_RECENTLY_POSTED,
-			"most-viewed" => SORT_MOST_VIEWED,
-			"most-favorited" => SORT_MOST_FAVORITED,
-			_ => SORT_RECENTLY_POSTED,
+		// "recently-posted" = latest by date, no sort param (API default)
+		// "most-viewed" = sort=8, "most-favorited" = sort=9
+		let sort: Option<i32> = match listing.id.as_str() {
+			"recently-posted" => None,
+			"most-viewed" => Some(SORT_MOST_VIEWED),
+			"most-favorited" => Some(SORT_MOST_FAVORITED),
+			_ => None,
 		};
 
-		let url = format!("{API}/books?page={page}&sort={sort}&limit=25");
+		let mut url = format!("{API}/books?page={page}");
+		if let Some(s) = sort {
+			url.push_str(&format!("&sort={s}"));
+		}
+
+		let clearance = get_clearance();
+		if let Some(ref crt) = clearance {
+			url.push_str("&crt=");
+			url.push_str(crt);
+		}
+
 		let books = Request::get(&url)?
 			.header("Referer", &format!("{ORIGIN}/"))
 			.header("Origin", ORIGIN)
