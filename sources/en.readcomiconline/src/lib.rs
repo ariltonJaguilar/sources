@@ -339,14 +339,18 @@ impl ListingProvider for ReadComicOnline {
 
 fn parse_comic_list(html: Document) -> MangaPageResult {
 	let entries = html
-		.select(".list-comic > .item > a:not(.hot-label)")
+		.select(".section.group.list")
 		.map(|elements| {
 			elements
 				.filter_map(|element| {
-					let url = element.attr("abs:href")?;
+					let cover_anchor = element.select_first(".col.cover > a")?;
+					let url = cover_anchor.attr("abs:href")?;
 					let key = url.strip_prefix(BASE_URL).map(String::from)?;
-					let title = element.text().unwrap_or_default();
-					let cover = element.select_first("img")?.attr("abs:src");
+					let cover = cover_anchor.select_first("img")?.attr("abs:src");
+					let title = element
+						.select_first(".col.info > p > a")
+						.and_then(|el| el.text())
+						.unwrap_or_default();
 					Some(Manga {
 						key,
 						title,
@@ -359,7 +363,7 @@ fn parse_comic_list(html: Document) -> MangaPageResult {
 		})
 		.unwrap_or_default();
 
-	let has_next_page = html.select("ul.pager > li > a:contains(Next)").is_some();
+	let has_next_page = html.select("a.right_bt.next_bt").is_some();
 
 	MangaPageResult {
 		entries,
@@ -375,105 +379,35 @@ impl Home for ReadComicOnline {
 
 		let mut components = Vec::new();
 
-		if let Some(banner_element) = html.select_first(".banner > .details") {
-			let url = banner_element
-				.select_first("a")
-				.and_then(|el| el.attr("abs:href"))
-				.ok_or(error!("missing"))?;
-			let key = url.strip_prefix_or_self(BASE_URL).into();
-			let title = banner_element
-				.select_first(".bigChar")
-				.and_then(|el| el.text())
-				.unwrap_or_default();
-			let cover = banner_element
-				.select_first("img")
-				.and_then(|el| el.attr("abs:src"));
-			let description = banner_element
-				.select("p")
-				.and_then(|mut els| els.next_back())
-				.and_then(|el| el.text());
-			let tags = banner_element
-				.select("p:has(span:contains(Genres:)) > a")
-				.map(|els| els.filter_map(|el| el.text()).collect::<Vec<_>>());
-			components.push(HomeComponent {
-				value: HomeComponentValue::BigScroller {
-					entries: vec![Manga {
-						key,
-						title,
-						cover,
-						description,
-						url: Some(url),
-						tags,
-						..Default::default()
-					}],
-					auto_scroll_interval: None,
-				},
-				..Default::default()
-			});
-		}
-
+		// Latest updates: .lst-update shows recent chapter additions as chapter URLs
+		// e.g. /Comic/Title/Issue-N?id=xxx → strip to /Comic/Title for the manga key
 		let updates = html
-			.select(".bigBarContainer > .barContent > .scrollable > .items a")
+			.select(".lst-update .item-list:eq(0) .section.group.list > .col > .sub-col-1 > a")
 			.map(|els| {
 				els.filter_map(|el| {
-					let url = el.attr("abs:href").unwrap_or_default();
-					let key = url.strip_prefix(BASE_URL)?.into();
-					let title = el.own_text()?;
-					let cover = el.select_first("img").and_then(|el| el.attr("abs:src"));
-					Some(
-						Manga {
-							key,
-							title,
-							cover,
-							url: Some(url),
-							..Default::default()
-						}
-						.into(),
-					)
+					let chapter_url = el.attr("abs:href")?;
+					// extract manga key: /Comic/Title from /Comic/Title/Issue-N?id=xxx
+					let path = chapter_url.strip_prefix(BASE_URL)?;
+					let mut segments = path.splitn(4, '/').filter(|s| !s.is_empty());
+					let comic = segments.next()?; // "Comic"
+					let title_slug = segments.next()?; // "Title-Slug"
+					let key = format!("/{}/{}", comic, title_slug);
+					let title = el.text().unwrap_or_default();
+					Some(Manga {
+						key,
+						title,
+						url: Some(format!("{BASE_URL}/{}/{}", comic, title_slug)),
+						..Default::default()
+					}.into())
 				})
 				.collect::<Vec<_>>()
 			})
 			.unwrap_or_default();
 		if !updates.is_empty() {
 			components.push(HomeComponent {
-				title: Some("Latest update".into()),
+				title: Some("Latest Updates".into()),
 				value: HomeComponentValue::Scroller {
 					entries: updates,
-					listing: None,
-				},
-				..Default::default()
-			});
-		}
-
-		let new = html
-			.select("#tab-newest > div")
-			.map(|els| {
-				els.filter_map(|el| {
-					let url = el.select_first("a")?.attr("abs:href").unwrap_or_default();
-					let key = url.strip_prefix(BASE_URL)?.into();
-					let title = el.select_first(".title > span")?.text()?;
-					let cover = el.select_first("img").and_then(|el| el.attr("abs:src"));
-					Some(
-						Manga {
-							key,
-							title,
-							cover,
-							url: Some(url),
-							..Default::default()
-						}
-						.into(),
-					)
-				})
-				.collect::<Vec<_>>()
-			})
-			.unwrap_or_default();
-		if !new.is_empty() {
-			components.push(HomeComponent {
-				title: Some("New comic".into()),
-				value: HomeComponentValue::MangaList {
-					ranking: true,
-					page_size: None,
-					entries: new,
 					listing: None,
 				},
 				..Default::default()
