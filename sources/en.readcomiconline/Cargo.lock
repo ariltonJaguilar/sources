@@ -26,6 +26,7 @@ dependencies = [
  "paste",
  "postcard",
  "serde",
+ "serde_json",
  "talc",
  "thiserror",
 ]
@@ -228,6 +229,7 @@ version = "0.1.0"
 dependencies = [
  "aidoku",
  "aidoku-test",
+ "serde",
  "serde_json",
 ]
 

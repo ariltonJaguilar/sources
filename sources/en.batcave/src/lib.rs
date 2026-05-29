@@ -23,12 +23,15 @@ struct BatCave;
 struct ChapterList {
 	news_id: i32,
 	chapters: Vec<SingleChapter>,
+	#[serde(default)]
+	xhash: String,
 }
 #[derive(Deserialize)]
 struct SingleChapter {
 	date: String,
 	id: i32,
 	title: String,
+	posi: Option<f32>,
 }
 #[derive(Deserialize)]
 struct PageList {
@@ -84,18 +87,15 @@ impl Source for BatCave {
 		let result = Request::get(&url)?.html()?;
 
 		let entries = result
-			.select("#dle-content > div:not(.pagination)")
-			.map(|elements| {
-				elements
-					.filter_map(|element| {
-						let url = element.select_first("a")?.attr("abs:href");
-						let key = url.clone()?.strip_prefix(BASE_URL)?.to_string();
-						let cover = element.select_first("img")?.attr("abs:data-src");
-						let title = element
-							.select_first("div > h2")
-							.and_then(|x| x.text())
-							.unwrap_or_default();
-
+				.select("#dle-content > .readed")
+				.map(|elements| {
+					elements
+						.filter_map(|element| {
+							let anchor = element.select_first(".readed__title > a")?;
+							let url = anchor.attr("abs:href");
+							let key = url.clone()?.strip_prefix(BASE_URL)?.to_string();
+							let cover = element.select_first("img")?.attr("abs:data-src");
+							let title = anchor.text().unwrap_or_default();
 						Some(Manga {
 							key,
 							cover,
@@ -192,7 +192,7 @@ impl Source for BatCave {
 				.chapters
 				.into_iter()
 				.map(|chapter| {
-					let url = format!("/reader/{}/{}", chapter_list.news_id, chapter.id);
+					let url = format!("/reader/{}/{}{}", chapter_list.news_id, chapter.id, chapter_list.xhash);
 
 					let title = chapter
 						.title
@@ -201,9 +201,9 @@ impl Source for BatCave {
 						.map(String::from)
 						.unwrap_or_else(|| chapter.title);
 
-					let chapter_number = title
-						.find('#')
-						.and_then(|idx| title[idx + 1..].parse::<f32>().ok());
+					let chapter_number = chapter.posi.or_else(|| {
+						title.find('#').and_then(|idx| title[idx + 1..].parse::<f32>().ok())
+					});
 
 					let date_uploaded = parse_date(&chapter.date, "dd.MM.yyyy");
 

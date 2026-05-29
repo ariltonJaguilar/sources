@@ -2,7 +2,7 @@
 	"info": {
 		"id": "en.readcomiconline",
 		"name": "ReadComicOnline",
-		"version": 1,
+		"version": 2,
 		"url": "https://readcomiconline.li",
 		"contentRating": 0,
 		"languages": ["en"]
