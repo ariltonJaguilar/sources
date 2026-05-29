@@ -995,9 +995,9 @@
     {
       "id": "multi.schalenetwork",
       "name": "SchaleNetwork",
-      "version": 2,
-      "iconURL": "icons/multi.schalenetwork-v2.png",
-      "downloadURL": "sources/multi.schalenetwork-v2.aix",
+      "version": 3,
+      "iconURL": "icons/multi.schalenetwork-v3.png",
+      "downloadURL": "sources/multi.schalenetwork-v3.aix",
       "languages": [
         "All",
         "en",
@@ -1005,7 +1005,7 @@
         "zh"
       ],
       "contentRating": 2,
-      "baseURL": "https://schale.network"
+      "baseURL": "https://niyaniya.moe"
     },
     {
       "id": "multi.suwayomi",
