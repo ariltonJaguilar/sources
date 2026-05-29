@@ -995,9 +995,9 @@
     {
       "id": "multi.schalenetwork",
       "name": "SchaleNetwork",
-      "version": 1,
-      "iconURL": "icons/multi.schalenetwork-v1.png",
-      "downloadURL": "sources/multi.schalenetwork-v1.aix",
+      "version": 2,
+      "iconURL": "icons/multi.schalenetwork-v2.png",
+      "downloadURL": "sources/multi.schalenetwork-v2.aix",
       "languages": [
         "All",
         "en",
