@@ -113,6 +113,18 @@
       "minAppVersion": "0.7.1"
     },
     {
+      "id": "en.flamecomics",
+      "name": "Flame Comics",
+      "version": 3,
+      "iconURL": "icons/en.flamecomics-v3.png",
+      "downloadURL": "sources/en.flamecomics-v3.aix",
+      "languages": [
+        "en"
+      ],
+      "contentRating": 0,
+      "baseURL": "https://flamecomics.xyz"
+    },
+    {
       "id": "en.hentainexus",
       "name": "HentaiNexus",
       "version": 1,
@@ -315,6 +327,18 @@
       ],
       "contentRating": 2,
       "baseURL": "https://manhwax.top"
+    },
+    {
+      "id": "en.ninemanga",
+      "name": "NineManga",
+      "version": 1,
+      "iconURL": "icons/en.ninemanga-v1.png",
+      "downloadURL": "sources/en.ninemanga-v1.aix",
+      "languages": [
+        "en"
+      ],
+      "contentRating": 1,
+      "baseURL": "https://www.ninemanga.com"
     },
     {
       "id": "en.novelbuddy",
